@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=390, initial-scale=1.0">
+<title>Story Recap</title>
+<style>
+  @font-face {
+    font-family: 'Damion';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('fonts/damion.woff2') format('woff2');
+  }
+  @font-face {
+    font-family: 'Schibsted Grotesk';
+    font-style: italic;
+    font-weight: 700;
+    font-display: swap;
+    src: url('fonts/schibsted-grotesk-italic-700.woff') format('woff');
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: -apple-system, 'SF Pro', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+  }
+
+  .phone-frame {
+    width: 390px;
+    height: 844px;
+    position: relative;
+    background: #000;
+    overflow: hidden;
+  }
+
+  /* Status Bar */
+  .status-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 390px;
+    height: 47px;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  .status-bar .time {
+    position: absolute;
+    left: 35px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 17px;
+    font-weight: 600;
+    color: white;
+    letter-spacing: -0.408px;
+    line-height: 22px;
+    width: 58px;
+    text-align: center;
+  }
+
+  .status-bar .icons {
+    position: absolute;
+    right: 25px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .status-bar .icons img {
+    display: block;
+  }
+
+  /* Content Area */
+  .content {
+    position: absolute;
+    top: 52px;
+    left: 0;
+    right: 0;
+    height: 694px;
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .content-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Top Overlay Gradient */
+  .top-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 136px;
+    z-index: 5;
+  }
+
+  .top-overlay img {
+    width: 100%;
+    height: 100%;
+    transform: scaleY(-1);
+    display: block;
+  }
+
+  /* Progress Bar */
+  .progress-bar {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    display: flex;
+    gap: 4px;
+    z-index: 6;
+  }
+
+  .progress-segment {
+    height: 3px;
+    flex: 1;
+    background: rgba(255, 255, 255, 0.34);
+    border-radius: 999px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .progress-segment.active::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 76%;
+    border-radius: 999px;
+    background: white;
+  }
+
+  /* Top Info */
+  .top-info {
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 6;
+  }
+
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-left: 12px;
+  }
+
+  .user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .username-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+  }
+
+  .username {
+    font-size: 17px;
+    font-weight: 500;
+    color: white;
+    line-height: 1.3;
+    font-family: 'TikTok Text', -apple-system, sans-serif;
+  }
+
+  .time-ago {
+    font-size: 15px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.6);
+    line-height: 1.3;
+    letter-spacing: 0.06px;
+    font-family: 'TikTok Text', -apple-system, sans-serif;
+  }
+
+  .top-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding-right: 16px;
+    padding-left: 12px;
+  }
+
+  .top-actions > img {
+    width: 24px;
+    height: 24px;
+    display: block;
+  }
+
+  .music-icon {
+    width: 24px;
+    height: 24px;
+    position: relative;
+  }
+
+  .music-cover {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+  }
+
+  .music-note {
+    position: absolute;
+    bottom: 1px;
+    right: 1px;
+    width: 8.6px;
+    height: 9.4px;
+  }
+
+  /* Subtitle: My March in Memories */
+  .cta-link {
+    position: absolute;
+    top: 71px;
+    left: 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 3;
+  }
+
+  .cta-link span {
+    font-family: 'Schibsted Grotesk', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    font-style: italic;
+    color: black;
+    line-height: 43.2px;
+  }
+
+  .cta-link .arrow-icon {
+    width: 22px;
+    height: 22px;
+    transform: rotate(180deg);
+  }
+
+  /* Title: This month felt quiet, tender, and true */
+  .text-title {
+    position: absolute;
+    top: 115px;
+    left: 24px;
+    width: 342px;
+    font-size: 36px;
+    font-weight: 700;
+    color: black;
+    line-height: 40px;
+    letter-spacing: -0.511px;
+    z-index: 3;
+    font-family: -apple-system, 'SF Pro', sans-serif;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Main Sticker - Friends Photo */
+  .sticker-friends {
+    position: absolute;
+    top: 93px;
+    left: 30px;
+    width: 350px;
+    height: 350px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+  }
+
+  .sticker-friends img {
+    width: 296px;
+    height: 296px;
+    object-fit: cover;
+  }
+
+  /* Kiss Emoji Sticker */
+  .emoji-kiss {
+    position: absolute;
+    top: 212px;
+    left: 25px;
+    width: 88px;
+    height: 87px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
+  }
+
+  .emoji-kiss img {
+    width: 72px;
+    height: 70px;
+    object-fit: cover;
+  }
+
+  /* Poem text (Damion script) */
+  .text-poem {
+    position: absolute;
+    top: 434px;
+    left: 24px;
+    width: 183px;
+    font-family: 'Damion', cursive;
+    font-size: 26px;
+    font-weight: 400;
+    color: black;
+    line-height: 27.558px;
+    letter-spacing: -0.511px;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  /* Polaroid */
+  .polaroid {
+    position: absolute;
+    top: 429px;
+    left: 219px;
+    z-index: 3;
+  }
+
+  .polaroid-inner {
+    width: 90px;
+    height: 105px;
+    background: white;
+    border-radius: 3.6px;
+    padding: 4.8px;
+    padding-bottom: 6px;
+    box-shadow:
+      0.28px 2.24px 0.7px 0px rgba(0,0,0,0),
+      0.28px 1.4px 0.56px 0px rgba(0,0,0,0.01),
+      0.14px 0.84px 0.56px 0px rgba(0,0,0,0.05),
+      0px 0.42px 0.42px 0px rgba(0,0,0,0.09),
+      0px 0.14px 0.14px 0px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 4.8px;
+    overflow: hidden;
+    background-image: url('assets/bg-sky.png');
+    background-size: 7.86px 4.88px, auto;
+    background-position: top left;
+    background-repeat: repeat;
+  }
+
+  .polaroid-photo {
+    width: 100%;
+    height: 81.3px;
+    overflow: hidden;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .polaroid-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .polaroid-photo::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    box-shadow: inset 0px 0.08px 0.56px 0px rgba(0,0,0,0.25);
+    border-radius: inherit;
+  }
+
+  .polaroid-date {
+    font-family: 'Damion', cursive;
+    font-size: 8px;
+    line-height: 1.3;
+    color: black;
+    opacity: 0.7;
+    mix-blend-mode: darken;
+    text-align: center;
+  }
+
+  /* Wave emoji */
+  .emoji-wave {
+    position: absolute;
+    top: 466px;
+    left: 289px;
+    width: 87px;
+    height: 77px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
+  }
+
+  .emoji-wave img {
+    width: 82px;
+    height: 71px;
+    object-fit: cover;
+  }
+
+  /* Text: Tiny red berries */
+  .text-berries {
+    position: absolute;
+    top: 571px;
+    left: 24px;
+    width: 342px;
+    font-size: 20px;
+    font-weight: 700;
+    color: black;
+    line-height: 29.5px;
+    letter-spacing: -0.547px;
+    z-index: 3;
+    font-family: -apple-system, 'SF Pro', sans-serif;
+  }
+
+  /* Berries Stickers */
+  .sticker-berries {
+    position: absolute;
+    top: 582px;
+    left: 82px;
+    width: 86px;
+    height: 86px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sticker-berries img {
+    width: 56px;
+    height: 56px;
+    object-fit: cover;
+  }
+
+  .sticker-berries .pin {
+    position: absolute;
+    top: 13px;
+    left: 48px;
+    font-size: 18px;
+    transform: rotate(-50deg);
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2));
+    z-index: 1;
+  }
+
+  /* Bottom Interaction Bar */
+  .interaction {
+    position: absolute;
+    bottom: 42px;
+    left: 0;
+    right: 0;
+    padding: 0 12px;
+    z-index: 10;
+  }
+
+  .dm-bar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    height: 64px;
+    padding-top: 8px;
+    padding-right: 6px;
+    justify-content: center;
+  }
+
+  .dm-input {
+    width: 272px;
+    height: 48px;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .dm-input-bg {
+    position: absolute;
+    inset: 0;
+    border-radius: 1000px;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    overflow: hidden;
+  }
+
+  .dm-input-content {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 16px;
+    padding-right: 12px;
+    border-radius: 189px;
+  }
+
+  .dm-placeholder {
+    font-size: 15px;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.6);
+    letter-spacing: 0.06px;
+    line-height: 1.3;
+    font-family: 'TikTok Text', -apple-system, sans-serif;
+  }
+
+  .dm-emojis {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 28px;
+    line-height: 1;
+  }
+
+  .dm-emojis span {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .interaction-icons {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .interaction-icons img {
+    width: 28px;
+    height: 28px;
+    display: block;
+  }
+
+  /* Home Indicator */
+  .home-indicator {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 390px;
+    height: 34px;
+  }
+
+  .home-indicator .grabber {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 140px;
+    height: 5px;
+    background: white;
+    border-radius: 999px;
+  }
+
+  /* Alive animations */
+  @keyframes float-gentle {
+    0%, 100% { transform: rotate(-11.67deg) translateY(0); }
+    50% { transform: rotate(-11.67deg) translateY(-6px); }
+  }
+
+  @keyframes rock-emoji {
+    0%, 100% { transform: rotate(-14.82deg); }
+    25% { transform: rotate(-20deg); }
+    75% { transform: rotate(-9deg); }
+  }
+
+  @keyframes sway-polaroid {
+    0%, 100% { transform: rotate(7.29deg) translateY(0); }
+    50% { transform: rotate(5deg) translateY(-4px); }
+  }
+
+  @keyframes bob-wave {
+    0%, 100% { transform: rotate(-4.17deg) translateY(0); }
+    50% { transform: rotate(-6deg) translateY(-5px); }
+  }
+
+  @keyframes drift-berries {
+    0%, 100% { transform: rotate(-16.75deg) translateY(0); }
+    50% { transform: rotate(-14deg) translateY(-3px); }
+  }
+
+  @keyframes breathe-bg {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+  }
+
+  .sticker-friends img {
+    animation: float-gentle 4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  }
+
+  .emoji-kiss img {
+    animation: rock-emoji 3s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  }
+
+  .polaroid-inner {
+    animation: sway-polaroid 5s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  }
+
+  .emoji-wave img {
+    animation: bob-wave 3.5s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  }
+
+  .sticker-berries img {
+    animation: drift-berries 4.5s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  }
+
+  .content-bg {
+    animation: breathe-bg 8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  }
+
+  /* Clickable emoji triggers */
+  .sticker-friends, .emoji-kiss, .polaroid, .emoji-wave, .sticker-berries, .dm-emojis span {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .emoji-particle {
+    position: absolute;
+    font-size: 72px;
+    line-height: 1;
+    width: 72px;
+    height: 72px;
+    text-align: center;
+    pointer-events: none;
+    z-index: 20;
+    will-change: left, top, transform, opacity;
+  }
+
+  /* Note Bubble */
+  @keyframes bubble-pop {
+    0% { opacity: 0; transform: rotate(4.68deg) scale(0.5); }
+    60% { opacity: 1; transform: rotate(4.68deg) scale(1.05); }
+    100% { opacity: 1; transform: rotate(4.68deg) scale(1); }
+  }
+
+  .note-bubble {
+    position: absolute;
+    z-index: 25;
+    pointer-events: none;
+    filter: drop-shadow(0px 1.28px 15.36px rgba(0,0,0,0.12));
+    transform-origin: 33px bottom;
+    transform: rotate(4.68deg);
+  }
+
+  .note-bubble-inner {
+    background: white;
+    border-radius: 20.8px;
+    padding: 0 12px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    max-width: 200px;
+    overflow: hidden;
+  }
+
+  .note-bubble-inner span {
+    font-family: 'TikTok Sans', -apple-system, sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: black;
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .note-bubble-tail {
+    position: absolute;
+    left: 28px;
+    top: 32px;
+    width: 22px;
+    height: 14px;
+    overflow: visible;
+  }
+
+  .note-bubble-tail svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sticker-friends img,
+    .emoji-kiss img,
+    .polaroid-inner,
+    .emoji-wave img,
+    .sticker-berries img,
+    .content-bg {
+      animation: none !important;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="phone-frame">
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <div class="time">8:00</div>
+    <div class="icons">
+      <img src="assets/signal-bars.svg" alt="" style="width:21px;height:13px;">
+      <img src="assets/wifi.svg" alt="" style="width:18px;height:13px;">
+      <img src="assets/battery.svg" alt="" style="width:29px;height:14px;">
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+    <!-- Background -->
+    <img class="content-bg" src="assets/content-bg.png" alt="">
+
+    <!-- Top Overlay -->
+    <div class="top-overlay">
+      <img src="assets/top-overlay.svg" alt="">
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar">
+      <div class="progress-segment active"></div>
+      <div class="progress-segment"></div>
+      <div class="progress-segment"></div>
+      <div class="progress-segment"></div>
+    </div>
+
+    <!-- Top Info -->
+    <div class="top-info">
+      <div class="user-info">
+        <div class="user-avatar">
+          <img src="assets/profile-pic.png" alt="">
+        </div>
+        <div class="username-group">
+          <span class="username">YY</span>
+          <span class="time-ago">· 4h ago</span>
+        </div>
+      </div>
+      <div class="top-actions">
+        <div class="music-icon">
+          <img class="music-cover" src="assets/music-cover.png" alt="">
+          <img class="music-note" src="assets/music-note.svg" alt="">
+        </div>
+        <img src="assets/close-icon.svg" alt="Close">
+      </div>
+    </div>
+
+    <!-- Subtitle: My March in Memories -->
+    <div class="cta-link">
+      <span>My March in Memories</span>
+      <img class="arrow-icon" src="assets/arrow-icon.svg" alt="">
+    </div>
+
+    <!-- Title -->
+    <p class="text-title">This month felt quiet, tender, and true.</p>
+
+    <!-- Kiss Emoji -->
+    <div class="emoji-kiss">
+      <img src="assets/berries-photo.png" alt="">
+    </div>
+
+    <!-- Friends Sticker -->
+    <div class="sticker-friends">
+      <img src="assets/friends-photo.png" alt="">
+    </div>
+
+    <!-- Poem text (Damion script) -->
+    <div class="text-poem">
+      <p>Kisses from friends,</p>
+      <p>small silhouettes on </p>
+      <p>a quiet shore</p>
+    </div>
+
+    <!-- Polaroid -->
+    <div class="polaroid">
+      <div class="polaroid-inner">
+        <div class="polaroid-photo">
+          <img src="assets/silhouettes-photo.png" alt="">
+        </div>
+        <div class="polaroid-date">March 1 2026</div>
+      </div>
+    </div>
+
+    <!-- Wave Emoji -->
+    <div class="emoji-wave">
+      <img src="assets/wave-emoji.png" alt="">
+    </div>
+
+    <!-- Text: Tiny red berries -->
+    <p class="text-berries">Tiny red berries hidden in deep green leaves.</p>
+
+    <!-- Berries Stickers -->
+    <div class="sticker-berries">
+      <img src="assets/polaroid-photo.png" alt="">
+      <span class="pin">🧷</span>
+    </div>
+  </div>
+
+  <!-- Interaction Bar -->
+  <div class="interaction">
+    <div class="dm-bar">
+      <div class="dm-input">
+        <div class="dm-input-bg"></div>
+        <div class="dm-input-content">
+          <span class="dm-placeholder">Message....</span>
+          <div class="dm-emojis">
+            <span>😘</span>
+            <span>🌊</span>
+            <span>🍒</span>
+          </div>
+        </div>
+      </div>
+      <div class="interaction-icons">
+        <img src="icons/Icon_Like.svg" alt="Like">
+        <img src="icons/Icon_Share.svg" alt="Share">
+      </div>
+    </div>
+  </div>
+
+  <!-- Home Indicator -->
+  <div class="home-indicator">
+    <div class="grabber"></div>
+  </div>
+</div>
+<script>
+// Emoji burst animation per PDF spec
+// Original canvas: 1170x2532, our frame: 390x844 → scale 1/3
+const S = 390 / 1170;
+const CT = 52; // content top offset
+
+// 11 emoji configs from the motion spec
+// ss/se=scale start/end time, sf/st=scale from/to
+// ps/pe=position start/end time, xs/ys/xe/ye=position from/to (original coords)
+// as/ae=alpha start/end time, af=alpha from value
+const specs = [
+  {ss:650,se:1250,sf:0.73,st:1.05,ps:30,pe:1310,xs:245,ys:2598,xe:245,ye:1264,as:830,ae:1400,af:1},
+  {ss:700,se:1250,sf:0.46,st:0.7,ps:250,pe:1350,xs:529,ys:2598,xe:529,ye:1566,as:880,ae:1420,af:0.5},
+  {ss:680,se:1350,sf:0.67,st:0.8,ps:200,pe:1400,xs:637,ys:2600,xe:637,ye:1194,as:1000,ae:1450,af:0.7},
+  {ss:650,se:1100,sf:0.5,st:0.9,ps:130,pe:1150,xs:1027,ys:2680,xe:1027,ye:1598,as:780,ae:1250,af:0.9},
+  {ss:750,se:1220,sf:0.4,st:0.6,ps:380,pe:1280,xs:361,ys:2600,xe:361,ye:1722,as:910,ae:1360,af:1},
+  {ss:660,se:1200,sf:0.5,st:0.7,ps:330,pe:1260,xs:727,ys:2600,xe:727,ye:1686,as:860,ae:1350,af:0.6},
+  {ss:800,se:1400,sf:0.67,st:0.95,ps:320,pe:1460,xs:903,ys:2602,xe:903,ye:1352,as:1000,ae:1500,af:1},
+  {ss:500,se:1080,sf:0.46,st:0.7,ps:110,pe:1150,xs:117,ys:2604,xe:117,ye:1530,as:720,ae:1200,af:1},
+  {ss:580,se:980,sf:0.5,st:0.75,ps:250,pe:1000,xs:605,ys:2602,xe:605,ye:1834,as:630,ae:1060,af:0.75},
+  {ss:770,se:1420,sf:0.4,st:0.6,ps:100,pe:1480,xs:801,ys:2598,xe:801,ye:1174,as:950,ae:1560,af:0.6},
+  {ss:560,se:1150,sf:0.43,st:0.65,ps:0,pe:1220,xs:457,ys:2602,xe:457,ye:1390,as:750,ae:1300,af:1},
+];
+
+const posEasing = 'cubic-bezier(0.32, 0.94, 0.60, 1.00)';
+const scaleEasing = 'cubic-bezier(0.32, 0.94, 0.60, 1.00)';
+const alphaEasing = 'cubic-bezier(0.42, 0.00, 0.58, 1.00)';
+
+function triggerEmojiBurst(emojiChar) {
+  const content = document.querySelector('.content');
+
+  specs.forEach(c => {
+    const el = document.createElement('span');
+    el.className = 'emoji-particle';
+    el.textContent = emojiChar;
+
+    const sx = c.xs * S - 30;
+    const sy = c.ys * S - CT - 30;
+    const ex = c.xe * S - 30;
+    const ey = c.ye * S - CT - 30;
+
+    el.style.left = sx + 'px';
+    el.style.top = sy + 'px';
+    el.style.transform = 'scale(' + c.sf + ')';
+    el.style.opacity = c.af;
+    content.appendChild(el);
+
+    // Position
+    el.animate([
+      { left: sx + 'px', top: sy + 'px' },
+      { left: ex + 'px', top: ey + 'px' }
+    ], { delay: c.ps, duration: c.pe - c.ps, easing: posEasing, fill: 'forwards' });
+
+    // Scale
+    el.animate([
+      { transform: 'scale(' + c.sf + ')' },
+      { transform: 'scale(' + c.st + ')' }
+    ], { delay: c.ss, duration: c.se - c.ss, easing: scaleEasing, fill: 'forwards' });
+
+    // Alpha fade out
+    el.animate([
+      { opacity: c.af },
+      { opacity: 0 }
+    ], { delay: c.as, duration: c.ae - c.as, easing: alphaEasing, fill: 'forwards' });
+
+    // Cleanup
+    const maxEnd = Math.max(c.pe, c.se, c.ae);
+    setTimeout(() => el.remove(), maxEnd + 100);
+  });
+}
+
+// Bottom DM emoji clicks
+document.querySelectorAll('.dm-emojis span').forEach(span => {
+  span.addEventListener('click', () => {
+    const e = span.textContent.trim();
+    if (e === '😘') triggerEmojiBurst('😘');
+    else if (e === '🌊') triggerEmojiBurst('🌊');
+    else if (e === '🍒') triggerEmojiBurst('🍒');
+  });
+});
+
+// Content area: Kiss emoji → kiss burst
+document.querySelector('.emoji-kiss').addEventListener('click', () => triggerEmojiBurst('😘'));
+
+// Content area: Wave emoji → wave burst
+document.querySelector('.emoji-wave').addEventListener('click', () => triggerEmojiBurst('🌊'));
+
+// Note bubble captions per sticker
+const bubbleCaptions = {
+  friends: [
+    'Cutest moment ever',
+    'My favorite people',
+    'Can\'t stop smiling',
+    'Best night out',
+    'Forever grateful',
+    'Squad goals',
+    'Pure happiness',
+    'Love these humans',
+  ],
+  polaroid: [
+    'Golden hour magic',
+    'Chasing the sunset',
+    'Silhouettes & dreams',
+    'That evening glow',
+    'Time stood still',
+    'Worth remembering',
+    'A perfect ending',
+    'Warm & peaceful',
+  ],
+  berries: [
+    'Hidden treasures',
+    'Nature\'s little gems',
+    'So tiny, so perfect',
+    'Spring is here',
+    'Found these beauties',
+    'Quiet discoveries',
+    'A pop of red',
+    'Simple joys',
+  ],
+};
+
+let activeBubble = null;
+let bubbleTimeout = null;
+const captionIndex = { friends: -1, polaroid: -1, berries: -1 };
+
+function getNextCaption(key) {
+  const captions = bubbleCaptions[key];
+  let idx;
+  do {
+    idx = Math.floor(Math.random() * captions.length);
+  } while (idx === captionIndex[key] && captions.length > 1);
+  captionIndex[key] = idx;
+  return captions[idx];
+}
+
+function showNoteBubble(targetEl, captionKey) {
+  // Remove existing bubble
+  if (activeBubble) {
+    activeBubble.remove();
+    activeBubble = null;
+  }
+  if (bubbleTimeout) {
+    clearTimeout(bubbleTimeout);
+    bubbleTimeout = null;
+  }
+
+  const frame = document.querySelector('.phone-frame');
+  const frameRect = frame.getBoundingClientRect();
+  const targetRect = targetEl.getBoundingClientRect();
+
+  const caption = getNextCaption(captionKey);
+
+  const bubble = document.createElement('div');
+  bubble.className = 'note-bubble';
+
+  const inner = document.createElement('div');
+  inner.className = 'note-bubble-inner';
+  const span = document.createElement('span');
+  span.textContent = caption;
+  inner.appendChild(span);
+
+  const tail = document.createElement('div');
+  tail.className = 'note-bubble-tail';
+  tail.innerHTML = '<svg viewBox="0 0 22 14" fill="none"><path d="M4 0C4 0 3 8 0 12C0 12.5 1 13.5 2 13C5 11 10 7 14 4C17 2 20 1 22 0H4Z" fill="white"/></svg>';
+
+  bubble.appendChild(inner);
+  bubble.appendChild(tail);
+  frame.appendChild(bubble);
+
+  // Position bubble per sticker type
+  const bw = bubble.offsetWidth;
+  const bh = bubble.offsetHeight;
+  let finalLeft, finalTop;
+
+  // Position so tail visually points into the target photo/sticker
+  if (targetEl.closest('.sticker-friends')) {
+    // Photo is 296x296 centered in 350x350 container
+    // Position bubble at upper-right of photo, tail pointing into photo
+    finalLeft = targetRect.left + 220 - frameRect.left;
+    finalTop = targetRect.top + 90 - frameRect.top; // bubble on the photo, tail into photo
+  } else if (targetEl.closest('.polaroid')) {
+    // Polaroid at ~429px top. Bubble above, tail tip on polaroid top
+    finalLeft = targetRect.left - frameRect.left - bw * 0.1;
+    finalTop = targetRect.top - frameRect.top - 14;
+  } else {
+    // Berry sticker. Bubble above, tail tip on sticker top
+    finalLeft = targetRect.left + targetRect.width * 0.2 - frameRect.left;
+    finalTop = targetRect.top - frameRect.top - 14;
+  }
+
+  // Clamp within frame
+  if (finalLeft + bw > 380) finalLeft = 380 - bw;
+  if (finalLeft < 10) finalLeft = 10;
+  if (finalTop < 60) finalTop = 60;
+
+  bubble.style.left = finalLeft + 'px';
+  bubble.style.top = finalTop + 'px';
+
+  // Bounce-in animation via Web Animations API
+  bubble.animate([
+    { opacity: 0, transform: 'rotate(4.68deg) scale(0.5)' },
+    { opacity: 1, transform: 'rotate(4.68deg) scale(1.05)', offset: 0.6 },
+    { opacity: 1, transform: 'rotate(4.68deg) scale(1)' }
+  ], { duration: 350, easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)', fill: 'forwards' });
+
+  activeBubble = bubble;
+
+  // Auto dismiss after 3.5s
+  bubbleTimeout = setTimeout(() => {
+    if (bubble.parentNode) bubble.remove();
+    if (activeBubble === bubble) activeBubble = null;
+  }, 3500);
+}
+
+// Sticker click → note bubble
+document.querySelector('.sticker-friends').addEventListener('click', () => {
+  showNoteBubble(document.querySelector('.sticker-friends'), 'friends');
+});
+document.querySelector('.polaroid').addEventListener('click', () => {
+  showNoteBubble(document.querySelector('.polaroid'), 'polaroid');
+});
+document.querySelector('.sticker-berries').addEventListener('click', () => {
+  showNoteBubble(document.querySelector('.sticker-berries'), 'berries');
+});
+
+// Press-scale animation for clickable content elements
+const pressEasing = 'cubic-bezier(0.37, 0, 0.63, 1)';
+const clickableEls = document.querySelectorAll('.sticker-friends, .emoji-kiss, .polaroid, .emoji-wave, .sticker-berries');
+clickableEls.forEach(el => {
+  el.style.cursor = 'pointer';
+  let pressed = false;
+  el.addEventListener('pointerdown', () => {
+    pressed = true;
+    el.animate([
+      { transform: 'scale(1)' },
+      { transform: 'scale(0.85)' }
+    ], { duration: 150, easing: pressEasing, fill: 'forwards' });
+  });
+  const release = () => {
+    if (!pressed) return;
+    pressed = false;
+    el.animate([
+      { transform: 'scale(0.85)' },
+      { transform: 'scale(1)' }
+    ], { duration: 150, easing: pressEasing, fill: 'forwards' });
+  };
+  el.addEventListener('pointerup', release);
+  el.addEventListener('pointerleave', release);
+  el.addEventListener('pointercancel', release);
+});
+</script>
+</body>
+</html>
